@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Official Bifrost LLM Gateway Service
+  # Central AI communication layer for all CodeLite AI operations
+  bifrost:
+    image: ghcr.io/maximhq/bifrost:latest
+    container_name: bifrost-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - BIFROST_HOST=0.0.0.0
+      - BIFROST_PORT=8080
+      # Pass through provider keys if available in host environment
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # CodeLite AI Agent & Analytics Dashboard
+  codelite-ai:
+    build: .
+    container_name: codelite-agent
+    ports:
+      - "8000:8000"
+    environment:
+      - BIFROST_BASE_URL=http://bifrost:8080/v1
+      - BIFROST_API_KEY=${BIFROST_API_KEY:-bifrost-default-key}
+      - BIFROST_MODEL=${BIFROST_MODEL:-openai/gpt-4o-mini}
+      - DEMO_MODE=auto
+      - HOST=0.0.0.0
+      - PORT=8000
+    depends_on:
+      - bifrost
+    volumes:
+      - ./codelite.db:/app/codelite.db
+    restart: unless-stopped

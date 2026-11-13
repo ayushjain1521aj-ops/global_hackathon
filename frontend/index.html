@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Configure Coding Task — CodeLite AI</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+
+  <!-- Material Symbols & Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  
+  <!-- Tailwind CSS via CDN with forms and container-queries -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#3E6AE1',
+              hover: '#2954CD',
+              subtle: '#EEF2FF',
+            },
+            neutral: {
+              50: '#F9FAFB',
+              100: '#F3F4F6',
+              200: '#E5E7EB',
+              300: '#D1D5DB',
+              400: '#9CA3AF',
+              500: '#6B7280',
+              600: '#4B5563',
+              700: '#374151',
+              800: '#1F2937',
+              900: '#111827',
+            }
+          },
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-white min-h-screen text-neutral-900 flex flex-col font-sans selection:bg-brand-subtle selection:text-brand">
+
+  <!-- Minimal App Header -->
+  <header class="sticky top-0 z-30 w-full bg-white/90 backdrop-blur-md border-b border-neutral-200">
+    <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Left: Logo & Breadcrumbs -->
+      <div class="flex items-center gap-6">
+        <a class="flex items-center gap-2.5 group" href="#" onclick="switchTab('configure-view'); return false;">
+          <div class="w-7 h-7 rounded-lg bg-neutral-900 text-white flex items-center justify-center font-mono font-semibold text-xs tracking-tight group-hover:bg-brand transition-colors">
+            CL
+          </div>
+          <span class="text-sm font-semibold tracking-tight text-neutral-900">CodeLite AI</span>
+        </a>
+        <div class="h-4 w-px bg-neutral-200 hidden lg:block"></div>
+        <nav class="hidden lg:flex items-center gap-1.5 text-xs text-neutral-500 font-medium max-w-[220px]">
+          <a class="hover:text-neutral-900 transition-colors" href="#" onclick="switchTab('configure-view'); return false;">App</a>
+          <span class="text-neutral-300">/</span>
+          <span class="text-neutral-900 font-semibold truncate" id="header-breadcrumb-active">Configure</span>
+        </nav>
+      </div>
+
+      <!-- Center: Segmented Navigation Pills -->
+      <nav class="hidden md:flex items-center gap-1 p-1 bg-neutral-100/80 border border-neutral-200 rounded-full text-xs font-medium overflow-x-auto max-w-full custom-scrollbar">
+        <button class="nav-tab-btn active px-2.5 py-1 whitespace-nowrap" data-tab="configure-view" onclick="switchTab('configure-view')">
+          <span class="material-symbols-outlined text-[15px]">tune</span>
+          <span>Configure</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="workspace-view" onclick="switchTab('workspace-view')">
+          <span class="material-symbols-outlined text-[15px]">terminal</span>
+          <span>Workspace</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="stalia-view" onclick="switchTab('stalia-view')">
+          <span class="material-symbols-outlined text-[15px] text-brand">verified</span>
+          <span>Fact Check</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="multiai-view" onclick="switchTab('multiai-view')">
+          <span class="material-symbols-outlined text-[15px]">call_split</span>
+          <span>Compare AIs</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="plugins-view" onclick="switchTab('plugins-view')">
+          <span class="material-symbols-outlined text-[15px]">extension</span>
+          <span>Add-ons</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="analytics-view" onclick="switchTab('analytics-view')">
+          <span class="material-symbols-outlined text-[15px]">monitoring</span>
+          <span>Analytics</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="benchmark-view" onclick="switchTab('benchmark-view')">
+          <span class="material-symbols-outlined text-[15px]">balance</span>
+          <span>Benchmarks</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="history-view" onclick="switchTab('history-view')">
+          <span class="material-symbols-outlined text-[15px]">history</span>
+          <span>History</span>
+        </button>
+        <button class="nav-tab-btn px-2.5 py-1 whitespace-nowrap" data-tab="bifrost-view" onclick="switchTab('bifrost-view')">
+          <span class="material-symbols-outlined text-[15px]">hub</span>
+          <span>Gateway</span>
+        </button>
+      </nav>
+
+      <!-- Right: Status Pill & Profile -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-neutral-50 border border-neutral-200 text-xs font-mono text-neutral-600 cursor-pointer hover:bg-neutral-100 transition-colors" id="header-gateway-pill" onclick="switchTab('bifrost-view')" title="Click to view Bifrost diagnostics">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" id="gateway-pulse-dot"></span>
+          <span id="header-gateway-status">Bifrost Direct (24ms)</span>
+        </div>
+        <div class="h-4 w-px bg-neutral-200 hidden sm:block"></div>
+        <div class="flex items-center gap-2.5">
+          <img alt="Sarah Chen" class="w-7 h-7 rounded-full object-cover ring-1 ring-neutral-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV85CHp-n9j2zDy66AyFLSTKAgY-dg6EwahI-CiPxidczpTsB0ZXg_fXJhNWFHd2X_cSD7_poRh2IYQw-Z7W9M4e7HRE_8nK57mtIluF3OWRnf-PhUgcQJ4modZ4VK_9B684vZU60Jg-2a6oDtaWRZZ4E7gn7A7W3YSGXtL3k75HyESW7x6n3oMizVCgyg9uPyVpggan4JZo7CO8juP-fYNIUMUdWaQ7pR-EkYCbQo"/>
+          <span class="text-xs font-medium text-neutral-700 hidden lg:inline">Sarah Chen</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sub-Navigation -->
+    <div class="flex md:hidden overflow-x-auto px-4 py-2 border-t border-neutral-200 gap-1 bg-neutral-50/80 custom-scrollbar">
+      <button class="nav-tab-btn active text-xs py-1 px-3 whitespace-nowrap" data-tab="configure-view" onclick="switchTab('configure-view')">Configure</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="workspace-view" onclick="switchTab('workspace-view')">Workspace</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 text-brand whitespace-nowrap" data-tab="stalia-view" onclick="switchTab('stalia-view')">Fact Check</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="multiai-view" onclick="switchTab('multiai-view')">Compare AIs</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="plugins-view" onclick="switchTab('plugins-view')">Add-ons</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="analytics-view" onclick="switchTab('analytics-view')">Analytics</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="benchmark-view" onclick="switchTab('benchmark-view')">Benchmarks</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="history-view" onclick="switchTab('history-view')">History</button>
+      <button class="nav-tab-btn text-xs py-1 px-3 whitespace-nowrap" data-tab="bifrost-view" onclick="switchTab('bifrost-view')">Gateway</button>
+    </div>
+  </header>
+
+  <!-- Main Body Layout -->
+  <main class="flex-1 max-w-[1400px] w-full mx-auto px-6 py-8">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: CONFIGURE CODING TASK (The Exact Stitch UI Design)                 -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane active" id="configure-view">
+      <!-- Title Area (Tesla-style clean headline & spacing) -->
+      <div class="mb-8 max-w-3xl">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">PIPELINE v4.8</span>
+          <span class="text-neutral-400 text-xs">•</span>
+          <span class="text-xs text-neutral-500 font-mono">Isolated Secure Sandbox</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-900">Configure Coding Task</h1>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed font-normal">
+          Set up your coding instructions, pick your programming language, and run safely in the sandbox.
+        </p>
+      </div>
+
+      <!-- 2-Column Responsive Workspace -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        <!-- LEFT COLUMN: Configurations & Directives (8 cols) -->
+        <div class="lg:col-span-8 space-y-10">
+          
+          <!-- 1. TASK SPECIFICATION -->
+          <section class="space-y-6">
+            <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <h2 class="text-sm font-semibold tracking-tight uppercase text-neutral-400 font-mono text-[11px]">
+                01 / Task Instructions
+              </h2>
+              <span class="text-xs text-neutral-400 font-mono" id="config-auto-run-id">Ready</span>
+            </div>
+
+            <!-- Task Name -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-neutral-800" for="task-name">Task Name</label>
+              <input class="w-full px-3.5 py-2.5 text-sm bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all font-medium" id="task-name" type="text" value="Make a Student class using constructor in Python"/>
+            </div>
+
+            <!-- Prompt Area -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-semibold text-neutral-800" for="task-description">Prompt &amp; Requirements</label>
+                <button class="inline-flex items-center gap-1.5 text-xs text-brand hover:text-brand-hover font-medium transition-colors" id="enhancer-btn" onclick="toggleEnhancement()" type="button">
+                  <span class="material-symbols-outlined text-sm">auto_fix_high</span>
+                  <span id="enhancer-label">Prompt Optimization: ON</span>
+                </button>
+              </div>
+              <div class="border border-neutral-200 rounded-xl overflow-hidden focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10 transition-all bg-white">
+                <textarea class="w-full p-3.5 bg-transparent font-mono text-xs text-neutral-800 placeholder-neutral-400 border-none focus:ring-0 resize-y leading-relaxed outline-none" id="task-description" rows="4">Make a Student class using constructor in Python.
+- Class name: Student
+- Constructor should initialize name and age
+- Include a display() method that prints student details
+- Provide an instantiation example with sample values</textarea>
+                <div class="px-3.5 py-2 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between text-[11px] font-mono text-neutral-500">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Clean Code
+                  </span>
+                  <span id="prompt-token-estimate">Est: 342 tokens</span>
+                </div>
+              </div>
+
+              <!-- Quick Preset Task Chips -->
+              <div class="flex items-center flex-wrap gap-2 pt-1">
+                <span class="text-xs text-neutral-400 font-mono">Sample Tasks:</span>
+                <button class="chip" onclick="applyPresetPrompt('student')" type="button">Student System</button>
+                <button class="chip" onclick="applyPresetPrompt('calculator')" type="button">Calculator</button>
+                <button class="chip" onclick="applyPresetPrompt('quicksort')" type="button">Quicksort</button>
+                <button class="chip" onclick="applyPresetPrompt('prime')" type="button">Prime Sieve</button>
+                <button class="chip" onclick="applyPresetPrompt('inventory')" type="button">Inventory</button>
+              </div>
+            </div>
+
+            <!-- Runtime Language Pills -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-neutral-800">Programming Language</label>
+              <div class="flex flex-wrap gap-2" id="runtime-pills">
+                <label class="cursor-pointer">
+                  <input checked="" class="peer sr-only" name="target_lang" type="radio" value="python"/>
+                  <div class="px-3.5 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-[#3572A5]"></span> Python 3.11
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="peer sr-only" name="target_lang" type="radio" value="typescript"/>
+                  <div class="px-3.5 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-[#3178C6]"></span> TypeScript 5.3
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="peer sr-only" name="target_lang" type="radio" value="go"/>
+                  <div class="px-3.5 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-[#00ADD8]"></span> Go 1.22
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="peer sr-only" name="target_lang" type="radio" value="rust"/>
+                  <div class="px-3.5 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-[#DEA584]"></span> Rust 1.77
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Code Complexity Calibrator & Light Preview -->
+            <div class="space-y-3 pt-2">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-semibold text-neutral-800">Code Style</label>
+                <span class="text-xs text-neutral-500">Clean, working code</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label class="cursor-pointer">
+                  <input checked="" class="peer sr-only" name="complexity_level" onchange="updateComplexityPreview('essential')" type="radio" value="essential"/>
+                  <div class="p-3.5 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle/40 bg-white hover:bg-neutral-50 transition-all">
+                    <div class="text-xs font-semibold text-neutral-900">Simple</div>
+                    <div class="text-[11px] text-neutral-500 mt-1 leading-snug">Clean standard code with no unnecessary wrappers.</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="peer sr-only" name="complexity_level" onchange="updateComplexityPreview('standard')" type="radio" value="standard"/>
+                  <div class="p-3.5 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle/40 bg-white hover:bg-neutral-50 transition-all">
+                    <div class="text-xs font-semibold text-neutral-900">Standard Typed</div>
+                    <div class="text-[11px] text-neutral-500 mt-1 leading-snug">Adds type hints and helpful docstrings.</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input class="peer sr-only" name="complexity_level" onchange="updateComplexityPreview('comprehensive')" type="radio" value="comprehensive"/>
+                  <div class="p-3.5 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle/40 bg-white hover:bg-neutral-50 transition-all">
+                    <div class="text-xs font-semibold text-neutral-900">Dataclass</div>
+                    <div class="text-[11px] text-neutral-500 mt-1 leading-snug">Uses modern Python dataclass structure.</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Light Code Preview Block -->
+              <div class="border border-neutral-200 rounded-xl overflow-hidden bg-neutral-50/70 mt-3">
+                <div class="px-4 py-2 bg-neutral-100/60 border-b border-neutral-200 flex items-center justify-between text-xs text-neutral-600 font-mono">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="font-medium text-neutral-800">solution.py</span>
+                  </div>
+                  <span class="text-neutral-400 text-[11px]">Preview Output</span>
+                </div>
+                <pre class="p-4 text-xs font-mono text-neutral-800 overflow-x-auto leading-relaxed custom-scrollbar bg-white" id="code-preview-block"><code><span class="text-blue-600 font-medium">class</span> <span class="text-neutral-900 font-semibold">Student</span>:
+    <span class="text-blue-600 font-medium">def</span> <span class="text-emerald-700">__init__</span>(<span class="text-neutral-600">self</span>, name, age):
+        <span class="text-neutral-600">self</span>.name = name
+        <span class="text-neutral-600">self</span>.age = age
+
+    <span class="text-blue-600 font-medium">def</span> <span class="text-emerald-700">display</span>(<span class="text-neutral-600">self</span>):
+        <span class="text-purple-600">print</span>(<span class="text-emerald-600">f"Student Name: {self.name}, Age: {self.age}"</span>)
+
+<span class="text-neutral-400"># Instantiation</span>
+student1 = <span class="text-neutral-900 font-semibold">Student</span>(<span class="text-emerald-600">"Alice"</span>, <span class="text-amber-700">20</span>)
+student1.display()</code></pre>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. INFERENCE ENGINE -->
+          <section class="space-y-4">
+            <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <h2 class="text-sm font-semibold tracking-tight uppercase text-neutral-400 font-mono text-[11px]">
+                02 / Choose AI Model
+              </h2>
+              <span class="text-xs text-neutral-500 font-mono">Bifrost Mesh: <span class="text-emerald-600 font-medium" id="bifrost-mesh-status">Online</span></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <!-- Claude 3.5 Sonnet (Default Active) -->
+              <label class="cursor-pointer">
+                <input checked="" class="peer sr-only" name="model_choice" onchange="updateSummaryModel('Claude 3.5 Sonnet', '24ms', '$0.017 USD', '5.6k', '18.4k', '-69% SAVINGS', 30)" type="radio" value="anthropic/claude-3-5-sonnet"/>
+                <div class="p-4 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:ring-1 peer-checked:ring-brand peer-checked:bg-white bg-white hover:bg-neutral-50 transition-all flex flex-col justify-between h-full">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">Anthropic</span>
+                      <span class="text-[11px] font-mono text-emerald-600 font-medium">24ms</span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-neutral-900">Claude 3.5 Sonnet</h3>
+                    <p class="text-xs text-neutral-500 mt-1 leading-relaxed">Top precision for AST analysis and clean syntax.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-500">
+                    <span>Tier 1</span>
+                    <span class="text-neutral-900 font-semibold">$3.00/1M</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- GPT-4o -->
+              <label class="cursor-pointer">
+                <input class="peer sr-only" name="model_choice" onchange="updateSummaryModel('GPT-4o', '38ms', '$0.028 USD', '6.1k', '16.2k', '-62% SAVINGS', 38)" type="radio" value="openai/gpt-4o"/>
+                <div class="p-4 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:ring-1 peer-checked:ring-brand peer-checked:bg-white bg-white hover:bg-neutral-50 transition-all flex flex-col justify-between h-full">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">OpenAI</span>
+                      <span class="text-[11px] font-mono text-emerald-600 font-medium">38ms</span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-neutral-900">GPT-4o</h3>
+                    <p class="text-xs text-neutral-500 mt-1 leading-relaxed">High throughput for standard pipelines and tests.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-500">
+                    <span>Standard</span>
+                    <span class="text-neutral-900 font-semibold">$5.00/1M</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- DeepSeek Coder V2 -->
+              <label class="cursor-pointer">
+                <input class="peer sr-only" name="model_choice" onchange="updateSummaryModel('DeepSeek Coder V2', 'Local EP', '$0.0016 USD', '4.2k', '19.1k', '-78% SAVINGS', 22)" type="radio" value="deepseek/deepseek-coder-v2"/>
+                <div class="p-4 rounded-xl border border-neutral-200 peer-checked:border-brand peer-checked:ring-1 peer-checked:ring-brand peer-checked:bg-white bg-white hover:bg-neutral-50 transition-all flex flex-col justify-between h-full">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">DeepSeek</span>
+                      <span class="text-[11px] font-mono text-neutral-400 font-medium">Local EP</span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-neutral-900">DeepSeek Coder V2</h3>
+                    <p class="text-xs text-neutral-500 mt-1 leading-relaxed">Fast local edge cluster inference at minimal cost.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-500">
+                    <span>Edge</span>
+                    <span class="text-neutral-900 font-semibold">$0.28/1M</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <!-- 3. EXECUTION & REPAIR POLICY -->
+          <section class="space-y-4">
+            <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+              <h2 class="text-sm font-semibold tracking-tight uppercase text-neutral-400 font-mono text-[11px]">
+                03 / Safe Running &amp; Auto-Fix
+              </h2>
+              <span class="text-xs text-neutral-500 font-mono">Safe Code Guarantee</span>
+            </div>
+
+            <!-- Concise Execution Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="material-symbols-outlined text-sm text-neutral-700">fact_check</span>
+                  <span class="text-xs font-semibold text-neutral-900">Target File</span>
+                </div>
+                <p class="text-xs text-neutral-500 leading-relaxed font-mono">/app/solution.py added to PYTHONPATH guarantee.</p>
+              </div>
+              <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="material-symbols-outlined text-sm text-neutral-700">lock</span>
+                  <span class="text-xs font-semibold text-neutral-900">Secure Sandbox</span>
+                </div>
+                <p class="text-xs text-neutral-500 leading-relaxed font-mono">Isolated memory and filesystem protection.</p>
+              </div>
+              <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="material-symbols-outlined text-sm text-neutral-700">schema</span>
+                  <span class="text-xs font-semibold text-neutral-900">Fast Cleanup</span>
+                </div>
+                <p class="text-xs text-neutral-500 leading-relaxed font-mono">Removes unused lines before running.</p>
+              </div>
+            </div>
+
+            <!-- Repair Settings Row -->
+            <div class="p-4 rounded-xl border border-neutral-200 bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center text-neutral-700">
+                  <span class="material-symbols-outlined text-base">auto_fix_normal</span>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-neutral-900">Smart Repair Policy</div>
+                  <div class="text-xs text-neutral-500">Only fixes code errors or missing packages without breaking your code.</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 text-xs font-mono">
+                <div class="flex items-center gap-2">
+                  <span class="text-neutral-500">Max Cycles:</span>
+                  <div class="flex items-center border border-neutral-200 rounded bg-white">
+                    <button class="px-2 py-0.5 hover:bg-neutral-100 text-neutral-600" onclick="decrementRepair()" type="button">-</button>
+                    <span class="px-2 py-0.5 font-semibold text-neutral-900" id="repair-cycles-count">3</span>
+                    <button class="px-2 py-0.5 hover:bg-neutral-100 text-neutral-600" onclick="incrementRepair()" type="button">+</button>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-neutral-500">Timeout:</span>
+                  <span class="font-semibold text-neutral-900" id="timeout-display">180s</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Minimal Summary Card (4 cols) -->
+        <div class="lg:col-span-4 sticky top-24 space-y-4">
+          <!-- Summary Card -->
+          <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-6 shadow-sm">
+            <div class="flex items-center justify-between pb-4 border-b border-neutral-100">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-semibold">OVERVIEW</span>
+                <h3 class="text-base font-semibold text-neutral-900">Run Summary</h3>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/50">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Ready
+              </span>
+            </div>
+
+            <!-- Token Estimation Pill -->
+            <div class="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-neutral-500 font-medium">Estimated Token Usage</span>
+                <span class="font-mono text-xs font-semibold text-brand bg-brand-subtle px-2 py-0.5 rounded" id="summary-savings-badge">-69% SAVINGS</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-semibold font-mono tracking-tight text-neutral-900" id="summary-tokens-val">5.6k</span>
+                <span class="text-xs text-neutral-500 font-mono">tokens</span>
+                <span class="text-xs text-neutral-400 font-mono ml-auto" id="summary-raw-tokens">18.4k raw</span>
+              </div>
+              <div class="w-full bg-neutral-200 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-brand h-full rounded-full transition-all" id="summary-progress-bar" style="width: 30%;"></div>
+              </div>
+            </div>
+
+            <!-- Configuration Details Table -->
+            <div class="space-y-3 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-500">Engine</span>
+                <span class="font-medium text-neutral-900 font-mono" id="summary-model">Claude 3.5 Sonnet</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-500">Latency</span>
+                <span class="text-emerald-600 font-mono font-medium" id="summary-latency">24ms direct</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-500">Environment</span>
+                <span class="text-neutral-900 font-mono">gVisor MicroVM</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-500">Est. Cost</span>
+                <span class="font-semibold text-neutral-900 font-mono" id="summary-cost">$0.017 USD</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 space-y-2">
+              <button class="w-full py-3 px-4 rounded-xl bg-brand hover:bg-brand-hover text-white font-medium text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]" id="btn-run-coding-task" onclick="triggerTaskRun()" type="button">
+                <span class="material-symbols-outlined text-lg">play_arrow</span>
+                <span>Run Coding Task</span>
+                <kbd class="ml-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/20 text-white font-normal">⌘↵</kbd>
+              </button>
+              <button class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-700 font-medium text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" onclick="saveDraftNotification()" type="button">
+                <span class="material-symbols-outlined text-sm text-neutral-400">bookmark_border</span>
+                <span>Save Draft</span>
+              </button>
+            </div>
+
+            <div class="pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+              <span>Cluster: us-east-1</span>
+              <span>v2.4.9</span>
+            </div>
+          </div>
+
+          <!-- Classpath Status Minimal Pill -->
+          <div class="px-4 py-3 rounded-xl border border-neutral-200 bg-white flex items-center justify-between text-xs shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+              <span class="text-neutral-700 font-medium">Classpath Verified</span>
+            </div>
+            <span class="text-[11px] font-mono text-neutral-400">/app :: python3.11</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: WORKSPACE & LIVE EXECUTION VIEW                                    -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="workspace-view">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2 py-0.5 rounded-full">CODE WORKSPACE</span>
+            <span class="text-neutral-400 text-xs">•</span>
+            <span class="text-xs text-neutral-500 font-mono" id="workspace-status-badge">Ready</span>
+          </div>
+          <h2 class="text-2xl font-semibold tracking-tight text-neutral-900" id="workspace-active-task-title">Code Workspace &amp; Live Run</h2>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="px-3.5 py-2 text-xs font-medium rounded-lg border border-brand/30 bg-brand-subtle text-brand hover:bg-brand/10 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm" id="btn-audit-stalia" onclick="auditWorkspaceCodeWithStalia()" type="button" title="Check factual accuracy of code and docstrings">
+            <span class="material-symbols-outlined text-sm">verified</span>
+            <span>Fact Check Code</span>
+          </button>
+          <button class="px-3.5 py-2 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors flex items-center gap-1.5 cursor-pointer" id="btn-copy-code" type="button">
+            <span class="material-symbols-outlined text-sm">content_copy</span>
+            <span>Copy Code</span>
+          </button>
+          <button class="px-3.5 py-2 text-xs font-medium rounded-lg bg-brand hover:bg-brand-hover text-white transition-colors flex items-center gap-1.5 cursor-pointer" onclick="switchTab('configure-view')" type="button">
+            <span class="material-symbols-outlined text-sm">tune</span>
+            <span>New Task</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Execution Telemetry Bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+          <div class="text-[11px] font-mono uppercase text-neutral-400">Tests Passed</div>
+          <div class="text-2xl font-bold font-mono text-neutral-900 mt-1" id="live-pass-rate">100%</div>
+          <div class="w-full bg-neutral-100 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" id="test-pass-bar" style="width: 100%;"></div>
+          </div>
+          <div class="text-[11px] text-neutral-500 font-mono mt-1" id="live-test-summary">Tests: 5 passed, 0 failed</div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+          <div class="text-[11px] font-mono uppercase text-neutral-400">AI Tokens</div>
+          <div class="text-2xl font-bold font-mono text-brand mt-1" id="live-total-tokens">821</div>
+          <div class="text-[11px] text-neutral-500 font-mono mt-2">
+            <span id="live-input-tokens">281</span> in / <span id="live-output-tokens">540</span> out
+          </div>
+          <div class="text-[11px] text-emerald-600 font-mono font-medium" id="token-source-tag">Tracked by Bifrost AI</div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+          <div class="text-[11px] font-mono uppercase text-neutral-400">Auto-Fix Cycles</div>
+          <div class="text-2xl font-bold font-mono text-neutral-900 mt-1" id="live-repair-attempts">0 / 5</div>
+          <div class="text-[11px] text-neutral-500 font-mono mt-2" id="live-exec-time">Execution: 216ms</div>
+          <div class="text-[11px] text-neutral-400 font-mono">Auto-Fixes Code</div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-neutral-200 bg-white">
+          <div class="text-[11px] font-mono uppercase text-neutral-400">Est. API Cost</div>
+          <div class="text-2xl font-bold font-mono text-neutral-900 mt-1" id="live-est-cost">$0.0003</div>
+          <div class="text-[11px] text-neutral-500 font-mono mt-2" id="live-sandbox-badge">Secure Process Sandbox</div>
+          <div class="text-[11px] text-neutral-400 font-mono">Safe, isolated environment</div>
+        </div>
+      </div>
+
+      <!-- Optional Stalia Code Verification Banner -->
+      <div id="workspace-stalia-audit-result" class="hidden mb-6 p-4 rounded-xl border border-brand/20 bg-brand-subtle/50 transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-brand text-white flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              ST
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-neutral-900">Code Fact Check</span>
+                <span id="stalia-audit-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-100 text-emerald-800">Verified True (100/100)</span>
+              </div>
+              <p id="stalia-audit-summary-text" class="text-xs text-neutral-600 mt-0.5">Code and docstrings checked against official library documentation.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 font-medium text-xs transition-colors flex items-center gap-1.5" onclick="viewAuditInStaliaStudio()" type="button">
+              <span>View in Fact Check Studio</span>
+              <span class="material-symbols-outlined text-xs">arrow_forward</span>
+            </button>
+            <button class="p-1 text-neutral-400 hover:text-neutral-600 rounded" onclick="document.getElementById('workspace-stalia-audit-result').classList.add('hidden')" type="button">
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Workspace 2-Column: Code Viewer + Activity Flow -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Code & Terminal Tabs (8 cols) -->
+        <div class="lg:col-span-8 border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm">
+          <div class="px-4 py-2 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between">
+            <div class="flex items-center gap-1">
+              <button class="code-tab active" data-target="tab-code-sol" onclick="switchCodeTab('tab-code-sol')">solution.py</button>
+              <button class="code-tab" data-target="tab-code-test" onclick="switchCodeTab('tab-code-test')">test_solution.py</button>
+              <button class="code-tab" data-target="tab-code-term" onclick="switchCodeTab('tab-code-term')">Sandbox Output</button>
+            </div>
+            <span class="text-[11px] font-mono text-neutral-400">Isolated FS: /app</span>
+          </div>
+
+          <div class="p-0">
+            <div class="code-tab-content active p-4" id="tab-code-sol">
+              <pre class="font-mono text-xs text-neutral-800 leading-relaxed overflow-x-auto custom-scrollbar bg-neutral-50/50 p-4 rounded-lg border border-neutral-100 min-h-[360px]"><code id="workspace-sol-code">class Calculator:
+    def add(self, a, b):
+        return a + b
+
+    def subtract(self, a, b):
+        return a - b
+
+    def multiply(self, a, b):
+        return a * b
+
+    def divide(self, a, b):
+        return a / b
+
+    def power(self, a, b):
+        return a ** b</code></pre>
+            </div>
+
+            <div class="code-tab-content p-4" id="tab-code-test">
+              <pre class="font-mono text-xs text-neutral-800 leading-relaxed overflow-x-auto custom-scrollbar bg-neutral-50/50 p-4 rounded-lg border border-neutral-100 min-h-[360px]"><code id="workspace-test-code">import unittest
+from solution import Calculator
+
+class TestCalculator(unittest.TestCase):
+    def setUp(self):
+        self.calc = Calculator()
+
+    def test_add(self):
+        self.assertEqual(self.calc.add(2, 3), 5)
+
+    def test_subtract(self):
+        self.assertEqual(self.calc.subtract(5, 3), 2)
+
+    def test_multiply(self):
+        self.assertEqual(self.calc.multiply(4, 3), 12)
+
+    def test_divide(self):
+        self.assertEqual(self.calc.divide(6, 2), 3.0)
+
+    def test_power(self):
+        self.assertEqual(self.calc.power(2, 3), 8)
+
+if __name__ == '__main__':
+    unittest.main()</code></pre>
+            </div>
+
+            <div class="code-tab-content p-4" id="tab-code-term">
+              <div class="terminal-viewer" id="display-terminal-output">
+                <div class="term-line prompt">codelite@sandbox:~$ python -m unittest -v</div>
+                <div class="term-line text-emerald-400">test_add (TestCalculator) ... ok</div>
+                <div class="term-line text-emerald-400">test_subtract (TestCalculator) ... ok</div>
+                <div class="term-line text-emerald-400">test_multiply (TestCalculator) ... ok</div>
+                <div class="term-line text-emerald-400">test_divide (TestCalculator) ... ok</div>
+                <div class="term-line text-emerald-400">test_power (TestCalculator) ... ok</div>
+                <div class="term-line text-neutral-400 mt-2">----------------------------------------------------------------------</div>
+                <div class="term-line text-emerald-300 font-semibold">Ran 5 tests in 0.000s — OK</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Autonomous Agent Timeline (4 cols) -->
+        <div class="lg:col-span-4 border border-neutral-200 rounded-xl overflow-hidden bg-white p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm text-brand">route</span>
+              <h3 class="text-xs font-semibold uppercase font-mono tracking-wider text-neutral-700">Autonomous Timeline</h3>
+            </div>
+            <span class="text-[11px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="agent-status-badge">Idle</span>
+          </div>
+
+          <div class="activity-timeline max-h-[420px] overflow-y-auto custom-scrollbar" id="activity-timeline">
+            <div class="timeline-item step-complete">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-msg"><strong>Analyzer:</strong> Checked task requirements carefully.</div>
+                <div class="timeline-time">10:45:12 AM</div>
+              </div>
+            </div>
+            <div class="timeline-item step-generate">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-msg"><strong>Code Generator:</strong> Created clean Python code through Bifrost Gateway.</div>
+                <div class="timeline-time">10:45:14 AM</div>
+              </div>
+            </div>
+            <div class="timeline-item step-complete">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-msg"><strong>Sandbox Runner:</strong> All 5 tests passed with zero errors.</div>
+                <div class="timeline-time">10:45:15 AM</div>
+              </div>
+            </div>
+            <div class="timeline-item step-finish">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-msg"><strong>Requirement Verifier:</strong> All requirements checked and verified (Score: 100%).</div>
+                <div class="timeline-time">10:45:16 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: TOKEN ANALYTICS VIEW                                               -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="analytics-view">
+      <div class="mb-8">
+        <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">OBSERVABILITY</span>
+        <h2 class="text-3xl font-semibold tracking-tight text-neutral-900 mt-2">Token Usage &amp; Cost Savings</h2>
+        <p class="text-sm text-neutral-500 mt-1">Real token counts and cost numbers tracked directly from Bifrost AI Gateway responses.</p>
+      </div>
+
+      <!-- 4 Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-1">
+          <div class="text-xs font-mono uppercase text-neutral-400">Total Tokens Used</div>
+          <div class="text-3xl font-bold font-mono tracking-tight text-neutral-900" id="analytics-total-tokens">17,551</div>
+          <div class="text-xs text-neutral-500 font-mono mt-1">Across all tasks run</div>
+        </div>
+
+        <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-1">
+          <div class="text-xs font-mono uppercase text-neutral-400">Average Token Savings</div>
+          <div class="text-3xl font-bold font-mono tracking-tight text-brand" id="analytics-avg-savings">84.4%</div>
+          <div class="text-xs text-neutral-500 font-mono mt-1">Compared to regular AI tools</div>
+        </div>
+
+        <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-1">
+          <div class="text-xs font-mono uppercase text-neutral-400">Tasks Completed</div>
+          <div class="text-3xl font-bold font-mono tracking-tight text-neutral-900" id="analytics-tasks-completed">16</div>
+          <div class="text-xs text-emerald-600 font-mono mt-1 font-medium">100% verified sandbox pass</div>
+        </div>
+
+        <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-1">
+          <div class="text-xs font-mono uppercase text-neutral-400">Estimated Spend</div>
+          <div class="text-3xl font-bold font-mono tracking-tight text-neutral-900" id="analytics-total-cost">$0.0073</div>
+          <div class="text-xs text-neutral-500 font-mono mt-1">Bifrost Gateway routed rates</div>
+        </div>
+      </div>
+
+      <!-- Comparison Chart & Mechanism Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="lg:col-span-7 p-6 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <h3 class="text-sm font-semibold text-neutral-900">Baseline vs CodeLite Token Comparison</h3>
+            <span class="text-xs font-mono text-neutral-400">Live Empirical Ratio</span>
+          </div>
+          <div class="relative h-[280px]">
+            <canvas id="chart-token-comparison"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 p-6 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-4">
+          <div class="border-b border-neutral-100 pb-3">
+            <h3 class="text-sm font-semibold text-neutral-900">Token Reduction Mechanisms</h3>
+            <p class="text-xs text-neutral-500 mt-0.5">Architectural innovations powering CodeLite AI</p>
+          </div>
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/50 flex items-center justify-between">
+              <div>
+                <strong class="text-xs font-semibold text-neutral-900 block">Smart Context Management</strong>
+                <p class="text-[11px] text-neutral-500">Prunes conversational history and removes repetitive boilerplate</p>
+              </div>
+              <span class="text-xs font-mono font-bold text-brand ml-3 whitespace-nowrap">-45% Input</span>
+            </div>
+
+            <div class="p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/50 flex items-center justify-between">
+              <div>
+                <strong class="text-xs font-semibold text-neutral-900 block">Targeted Error Correction</strong>
+                <p class="text-[11px] text-neutral-500">Sends surgical error slices without rewriting intact modules</p>
+              </div>
+              <span class="text-xs font-mono font-bold text-brand ml-3 whitespace-nowrap">-60% Debug</span>
+            </div>
+
+            <div class="p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/50 flex items-center justify-between">
+              <div>
+                <strong class="text-xs font-semibold text-neutral-900 block">Response Optimization</strong>
+                <p class="text-[11px] text-neutral-500">Strictly requests pure code blocks without conversational chatter</p>
+              </div>
+              <span class="text-xs font-mono font-bold text-brand ml-3 whitespace-nowrap">-30% Output</span>
+            </div>
+
+            <div class="p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/50 flex items-center justify-between">
+              <div>
+                <strong class="text-xs font-semibold text-neutral-900 block">SHA-256 Context Caching</strong>
+                <p class="text-[11px] text-neutral-500">Instantly reuses verified subtasks with zero gateway tokens</p>
+              </div>
+              <span class="text-xs font-mono font-bold text-emerald-600 ml-3 whitespace-nowrap">-100% Cache</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: BENCHMARKS VIEW                                                    -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="benchmark-view">
+      <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">AI BENCHMARKS</span>
+          <h2 class="text-3xl font-semibold tracking-tight text-neutral-900 mt-2">Side-by-Side Agent Comparison</h2>
+          <p class="text-sm text-neutral-500 mt-1">Side-by-side test: Regular AI coder vs CodeLite AI on the exact same tasks.</p>
+        </div>
+        <button class="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover text-white font-medium text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer" id="btn-run-all-benchmarks" type="button">
+          <span class="material-symbols-outlined text-base">play_arrow</span>
+          <span>Run All 5 Benchmarks</span>
+        </button>
+      </div>
+
+      <!-- Benchmark Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" id="benchmark-task-cards">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- History Table -->
+      <div class="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm">
+        <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-neutral-900">Past Benchmark Runs &amp; Token Savings</h3>
+          <span class="text-xs font-mono text-neutral-400">Stored in SQLite</span>
+        </div>
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="px-6 py-3 font-semibold">Task Name</th>
+                <th class="px-6 py-3 font-semibold">Standard Tokens</th>
+                <th class="px-6 py-3 font-semibold">CodeLite Tokens</th>
+                <th class="px-6 py-3 font-semibold">Savings %</th>
+                <th class="px-6 py-3 font-semibold">Requests</th>
+                <th class="px-6 py-3 font-semibold">Pass Rate</th>
+                <th class="px-6 py-3 font-semibold">Mode</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200" id="benchmark-history-tbody">
+              <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-neutral-400">Loading benchmark records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 5: TASK HISTORY VIEW                                                  -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="history-view">
+      <div class="mb-8">
+        <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">AUDIT LOG</span>
+        <h2 class="text-3xl font-semibold tracking-tight text-neutral-900 mt-2">Task Execution History</h2>
+        <p class="text-sm text-neutral-500 mt-1">History of all completed tasks, test results, and token usage.</p>
+      </div>
+
+      <div class="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="px-6 py-3 font-semibold">Task</th>
+                <th class="px-6 py-3 font-semibold">Language</th>
+                <th class="px-6 py-3 font-semibold">Status</th>
+                <th class="px-6 py-3 font-semibold">Tokens</th>
+                <th class="px-6 py-3 font-semibold">Cost</th>
+                <th class="px-6 py-3 font-semibold">Repairs</th>
+                <th class="px-6 py-3 font-semibold">Gateway</th>
+                <th class="px-6 py-3 font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-200" id="task-history-tbody">
+              <tr>
+                <td colspan="8" class="px-6 py-8 text-center text-neutral-400">Loading task history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 6: BIFROST MESH & SETTINGS VIEW                                       -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="bifrost-view">
+      <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">BIFROST PRIORITY TRACK</span>
+          <h2 class="text-3xl font-semibold tracking-tight text-neutral-900 mt-2">Bifrost LLM Gateway Configuration</h2>
+          <p class="text-sm text-neutral-500 mt-1">The bridge connecting CodeLite AI to all AI models with fast routing and live stats.</p>
+        </div>
+        <button class="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer" id="btn-ping-gateway" type="button">
+          <span class="material-symbols-outlined text-base">sensors</span>
+          <span>Test Ping Gateway</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Live Gateway Diagnostics (6 cols) -->
+        <div class="lg:col-span-6 p-6 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <h3 class="text-sm font-semibold text-neutral-900">Gateway Status &amp; Health</h3>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/50" id="bifrost-diag-badge">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Online &amp; Healthy
+            </span>
+          </div>
+
+          <div class="space-y-3 text-xs font-mono">
+            <div class="flex items-center justify-between py-1.5 border-b border-neutral-100">
+              <span class="text-neutral-500">Gateway Base URL:</span>
+              <code class="text-neutral-900 font-semibold" id="bifrost-diag-url">http://localhost:8080/v1</code>
+            </div>
+            <div class="flex items-center justify-between py-1.5 border-b border-neutral-100">
+              <span class="text-neutral-500">Active Routed Model:</span>
+              <code class="text-brand font-semibold" id="bifrost-diag-model">gemini/gemini-3.5-flash-lite</code>
+            </div>
+            <div class="flex items-center justify-between py-1.5 border-b border-neutral-100">
+              <span class="text-neutral-500">Gateway Latency:</span>
+              <span class="text-emerald-600 font-semibold" id="bifrost-diag-latency">21ms</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5 border-b border-neutral-100">
+              <span class="text-neutral-500">Operational Mode:</span>
+              <span class="text-neutral-900">Direct Gateway Inference</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="text-neutral-500">Provider Agility:</span>
+              <span class="text-neutral-700">OpenAI SDK Compatible via Bifrost</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Update Gateway Configuration (6 cols) -->
+        <div class="lg:col-span-6 p-6 rounded-xl border border-neutral-200 bg-white shadow-sm space-y-4">
+          <div class="border-b border-neutral-100 pb-3">
+            <h3 class="text-sm font-semibold text-neutral-900">Change Gateway Settings</h3>
+            <p class="text-xs text-neutral-500 mt-0.5">Switch models and web addresses easily</p>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs font-semibold text-neutral-800 block mb-1">Bifrost Gateway Base URL</label>
+              <input class="w-full px-3.5 py-2 text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand" id="cfg-base-url" type="text" value="http://localhost:8080/v1"/>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-neutral-800 block mb-1">Bifrost Virtual Key</label>
+              <input class="w-full px-3.5 py-2 text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand" id="cfg-api-key" placeholder="sk-bf-codelite-main-key" type="password"/>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-neutral-800 block mb-1">Choose AI Model</label>
+              <input class="w-full px-3.5 py-2 text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand" id="cfg-model" list="models-datalist" type="text" value="gemini/gemini-3.5-flash-lite"/>
+              <datalist id="models-datalist">
+                <option value="gemini/gemini-3.5-flash-lite">
+                <option value="openai/gpt-4o-mini">
+                <option value="openai/gpt-4o">
+                <option value="anthropic/claude-3-5-sonnet">
+                <option value="anthropic/claude-3-5-haiku">
+              </datalist>
+            </div>
+
+            <button class="w-full py-2.5 px-4 rounded-lg bg-brand hover:bg-brand-hover text-white font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2" id="btn-save-gateway-cfg" type="button">
+              <span class="material-symbols-outlined text-sm">save</span>
+              <span>Save &amp; Apply Gateway Configuration</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB: STALIA FACTUAL VERIFICATION & FRESHNESS STUDIO                       -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="stalia-view">
+      <!-- Header -->
+      <div class="mb-8 max-w-3xl">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">FACT CHECK ENGINE</span>
+          <span class="text-neutral-400 text-xs">•</span>
+          <span class="text-xs text-neutral-500 font-mono">Checks Facts with Official Sources</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-900">Fact Check Studio</h1>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed font-normal">
+          Check if statements, answers, or code claims are true, false, or outdated. Verified against live official sources.
+        </p>
+      </div>
+
+      <!-- 2-Column Responsive Workspace -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Input Directives & Claim Cards (8 cols) -->
+        <div class="lg:col-span-8 space-y-6">
+          
+          <!-- Answer Input Card -->
+          <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-3">
+              <span class="text-sm font-semibold tracking-tight uppercase text-neutral-400 font-mono text-[11px]">
+                01 / Enter Statement or Question
+              </span>
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-neutral-400">Examples:</span>
+                <button type="button" onclick="loadStaliaPreset(0)" class="px-2 py-0.5 rounded border border-neutral-200 hover:border-brand hover:text-brand text-neutral-600 transition-colors">Tech</button>
+                <button type="button" onclick="loadStaliaPreset(1)" class="px-2 py-0.5 rounded border border-neutral-200 hover:border-brand hover:text-brand text-neutral-600 transition-colors">Economics</button>
+                <button type="button" onclick="loadStaliaPreset(2)" class="px-2 py-0.5 rounded border border-neutral-200 hover:border-brand hover:text-brand text-neutral-600 transition-colors">Space &amp; Health</button>
+              </div>
+            </div>
+
+            <!-- Provider Selection Pills -->
+            <div>
+              <label class="text-xs font-semibold text-neutral-800 block mb-2">Source / AI Model</label>
+              <div class="flex flex-wrap gap-2" id="stalia-provider-group">
+                <label class="cursor-pointer">
+                  <input type="radio" name="stalia_provider" value="chatgpt" checked class="peer sr-only">
+                  <div class="px-3 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> ChatGPT
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="stalia_provider" value="claude" class="peer sr-only">
+                  <div class="px-3 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> Claude
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="stalia_provider" value="gemini" class="peer sr-only">
+                  <div class="px-3 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Gemini
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="stalia_provider" value="perplexity" class="peer sr-only">
+                  <div class="px-3 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> Perplexity
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="stalia_provider" value="codelite" class="peer sr-only">
+                  <div class="px-3 py-1.5 rounded-lg border border-neutral-200 peer-checked:border-brand peer-checked:bg-brand-subtle peer-checked:text-brand text-xs font-medium text-neutral-700 bg-white hover:bg-neutral-50 transition-all flex items-center gap-1.5 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span> CodeLite
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Answer Textarea -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label for="stalia-input-text" class="text-xs font-semibold text-neutral-800">Text, Question, or Code to Fact Check</label>
+                <div class="flex items-center gap-3">
+                  <button type="button" onclick="loadRandomStaliaSample()" class="text-xs text-brand hover:underline flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">shuffle</span>
+                    <span>Random Sample</span>
+                  </button>
+                  <button type="button" onclick="clearStaliaInput()" class="text-xs text-neutral-400 hover:text-neutral-700">Clear</button>
+                </div>
+              </div>
+              <div class="border border-neutral-200 rounded-xl overflow-hidden focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10 transition-all bg-white">
+                <textarea id="stalia-input-text" rows="5" class="w-full p-3.5 bg-transparent font-sans text-sm text-neutral-800 placeholder-neutral-400 border-none focus:ring-0 resize-y leading-relaxed outline-none" placeholder="Type a question or paste text here (e.g. 'Is Apple making mobile phones?' or 'Does Apple make refrigerators?')..."></textarea>
+                <div class="px-3.5 py-2 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between text-xs font-mono text-neutral-500">
+                  <span id="stalia-char-count">0 characters</span>
+                  <span>Checked by Bifrost AI</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+              <button type="button" id="btn-run-stalia-verify" onclick="runStaliaVerification()" class="flex-1 py-3 px-4 rounded-xl bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-base">verified</span>
+                <span id="stalia-verify-btn-text">Check Facts</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Claims Breakdown Container -->
+          <div id="stalia-results-section" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-200 pb-3">
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-semibold tracking-tight uppercase text-neutral-500 font-mono text-[11px]">
+                  02 / Checked Facts &amp; Sources
+                </h2>
+                <span id="stalia-claims-count-badge" class="px-2 py-0.5 rounded-full text-xs font-mono font-medium bg-neutral-100 text-neutral-700">0 items</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1 text-xs" id="stalia-claim-filters">
+                <button type="button" class="claim-filter-btn active px-2.5 py-1 rounded-md border border-neutral-200 text-neutral-700 bg-white" data-filter="all" onclick="filterStaliaClaims('all')">All</button>
+                <button type="button" class="claim-filter-btn px-2.5 py-1 rounded-md border border-neutral-200 text-neutral-500" data-filter="supported" onclick="filterStaliaClaims('supported')">Verified True</button>
+                <button type="button" class="claim-filter-btn px-2.5 py-1 rounded-md border border-neutral-200 text-neutral-500" data-filter="refuted" onclick="filterStaliaClaims('refuted')">False</button>
+                <button type="button" class="claim-filter-btn px-2.5 py-1 rounded-md border border-neutral-200 text-neutral-500" data-filter="potentially-stale" onclick="filterStaliaClaims('potentially-stale')">Outdated</button>
+                <button type="button" class="claim-filter-btn px-2.5 py-1 rounded-md border border-neutral-200 text-neutral-500" data-filter="needs-review" onclick="filterStaliaClaims('needs-review')">Needs Checking</button>
+              </div>
+            </div>
+
+            <div id="stalia-claims-container" class="space-y-3">
+              <div class="p-8 text-center border border-dashed border-neutral-200 rounded-xl text-neutral-400 text-xs">
+                Enter a statement or question above and click "Check Facts" to see whether it is true, false, or outdated.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Trust Snapshot & History (4 cols) -->
+        <div class="lg:col-span-4 sticky top-24 space-y-4">
+          <!-- Stalia Trust Snapshot Card -->
+          <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-5 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-semibold">FACT SCORE</span>
+                <h3 class="text-base font-semibold text-neutral-900">Accuracy Overview</h3>
+              </div>
+              <span id="stalia-snapshot-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium text-neutral-600 bg-neutral-100">
+                Ready to Check
+              </span>
+            </div>
+
+            <!-- Score Display -->
+            <div class="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-between">
+              <div>
+                <div class="text-xs text-neutral-500">Accuracy Score</div>
+                <div class="text-3xl font-bold font-mono text-neutral-900" id="stalia-score-val">--<span class="text-sm font-normal text-neutral-400">/100</span></div>
+              </div>
+              <div class="text-right">
+                <div id="stalia-score-label" class="text-xs font-semibold text-neutral-700">Not checked yet</div>
+                <div class="text-[11px] text-neutral-400 font-mono" id="stalia-evidence-coverage">Proof: --%</div>
+              </div>
+            </div>
+
+            <!-- Score Explanation -->
+            <p id="stalia-score-explanation" class="text-xs text-neutral-600 leading-relaxed font-sans">
+              Enter any statement above to check if it is factual, false, or outdated.
+            </p>
+
+            <!-- Metrics Matrix -->
+            <div class="grid grid-cols-4 gap-1.5 text-center text-xs font-mono">
+              <div class="p-2 rounded-lg bg-emerald-50/60 border border-emerald-100">
+                <div class="text-[9px] text-emerald-700 font-semibold uppercase">True</div>
+                <div class="text-base font-bold text-emerald-800" id="stalia-stat-supported">0</div>
+              </div>
+              <div class="p-2 rounded-lg bg-red-50/60 border border-red-100">
+                <div class="text-[9px] text-red-700 font-semibold uppercase">False</div>
+                <div class="text-base font-bold text-red-800" id="stalia-stat-refuted">0</div>
+              </div>
+              <div class="p-2 rounded-lg bg-amber-50/60 border border-amber-100">
+                <div class="text-[9px] text-amber-700 font-semibold uppercase">Outdated</div>
+                <div class="text-base font-bold text-amber-800" id="stalia-stat-stale">0</div>
+              </div>
+              <div class="p-2 rounded-lg bg-neutral-100 border border-neutral-200">
+                <div class="text-[9px] text-neutral-600 font-semibold uppercase">Review</div>
+                <div class="text-base font-bold text-neutral-800" id="stalia-stat-review">0</div>
+              </div>
+            </div>
+
+            <!-- Copy Report CTA -->
+            <button type="button" id="btn-copy-stalia-report" onclick="copyStaliaVerificationReport()" class="w-full py-2.5 px-4 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-medium text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">content_copy</span>
+              <span>Copy Fact-Check Report</span>
+            </button>
+          </div>
+
+          <!-- Recent Checks Card -->
+          <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-4 shadow-sm">
+            <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-500 font-mono">Recent Checks</h3>
+              <button type="button" onclick="loadStaliaHistory()" class="text-neutral-400 hover:text-neutral-600" title="Refresh">
+                <span class="material-symbols-outlined text-sm">refresh</span>
+              </button>
+            </div>
+            <div id="stalia-recent-checks-list" class="space-y-2 text-xs font-mono">
+              <div class="text-center py-4 text-neutral-400">No past checks recorded yet.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB: MULTI-AI CONSENSUS & CORROBORATION STUDIO                            -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="multiai-view">
+      <!-- Header -->
+      <div class="mb-8 max-w-3xl">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">COMPARE AIs</span>
+          <span class="text-neutral-400 text-xs">•</span>
+          <span class="text-xs text-neutral-500 font-mono">Side-by-Side Fact Checking</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-900">Compare Multiple AIs</h1>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed font-normal">
+          Check answers from ChatGPT, Claude, and Gemini side by side. See where they agree and catch any mistakes.
+        </p>
+      </div>
+
+      <!-- Presets Selector -->
+      <div class="mb-6 p-4 rounded-xl border border-neutral-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-neutral-700">Example Topics:</span>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="loadMultiAIPreset(0)" class="px-3 py-1 rounded-lg border border-neutral-200 hover:border-brand hover:text-brand text-xs font-medium text-neutral-700 bg-white transition-colors" id="btn-multiai-preset-0">
+              AI Models &amp; Tech
+            </button>
+            <button type="button" onclick="loadMultiAIPreset(1)" class="px-3 py-1 rounded-lg border border-neutral-200 hover:border-brand hover:text-brand text-xs font-medium text-neutral-700 bg-white transition-colors" id="btn-multiai-preset-1">
+              Interest Rates &amp; Economy
+            </button>
+          </div>
+        </div>
+        <button type="button" id="btn-run-multiai-verify" onclick="runMultiAICorrobation()" class="px-4 py-2 rounded-xl bg-brand hover:bg-brand-hover text-white font-medium text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">call_split</span>
+          <span id="multiai-run-btn-text">Check Across All 3 AIs</span>
+        </button>
+      </div>
+
+      <!-- 3-Column Comparative Input -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <!-- ChatGPT Column -->
+        <div class="multi-ai-col shadow-sm">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-neutral-900 font-mono">ChatGPT</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">OpenAI</span>
+          </div>
+          <textarea id="multiai-chatgpt-text" rows="7" class="w-full p-2.5 text-xs font-sans text-neutral-800 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-brand resize-y leading-relaxed" placeholder="ChatGPT answer..."></textarea>
+          <div id="multiai-chatgpt-status" class="text-[11px] font-mono text-neutral-500">Ready to compare</div>
+        </div>
+
+        <!-- Claude Column -->
+        <div class="multi-ai-col shadow-sm">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span class="text-xs font-bold text-neutral-900 font-mono">Claude</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">Anthropic</span>
+          </div>
+          <textarea id="multiai-claude-text" rows="7" class="w-full p-2.5 text-xs font-sans text-neutral-800 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-brand resize-y leading-relaxed" placeholder="Claude answer..."></textarea>
+          <div id="multiai-claude-status" class="text-[11px] font-mono text-neutral-500">Ready to compare</div>
+        </div>
+
+        <!-- Gemini Column -->
+        <div class="multi-ai-col shadow-sm">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              <span class="text-xs font-bold text-neutral-900 font-mono">Gemini</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">Google</span>
+          </div>
+          <textarea id="multiai-gemini-text" rows="7" class="w-full p-2.5 text-xs font-sans text-neutral-800 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-brand resize-y leading-relaxed" placeholder="Gemini answer..."></textarea>
+          <div id="multiai-gemini-status" class="text-[11px] font-mono text-neutral-500">Ready to compare</div>
+        </div>
+      </div>
+
+      <!-- Consensus Analytics & Discrepancies (Revealed on run) -->
+      <div id="multiai-results-container" class="space-y-6 hidden">
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm">
+            <div class="text-[11px] font-mono uppercase text-neutral-400">AI Agreement Rate</div>
+            <div class="text-3xl font-bold font-mono text-brand mt-1" id="multiai-agreement-rate">--%</div>
+            <div class="w-full bg-neutral-100 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div class="bg-brand h-full rounded-full transition-all duration-500" id="multiai-agreement-bar" style="width: 0%;"></div>
+            </div>
+            <div class="text-[11px] text-neutral-500 font-mono mt-1">How closely the AIs agree</div>
+          </div>
+
+          <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm">
+            <div class="text-[11px] font-mono uppercase text-neutral-400">Accuracy Score</div>
+            <div class="text-3xl font-bold font-mono text-neutral-900 mt-1" id="multiai-consensus-score">--/100</div>
+            <div class="text-[11px] text-emerald-600 font-mono mt-2" id="multiai-consensus-verdict">Calculated across all models</div>
+          </div>
+
+          <div class="p-5 rounded-xl border border-neutral-200 bg-white shadow-sm">
+            <div class="text-[11px] font-mono uppercase text-neutral-400">AI Accuracy Ranking</div>
+            <div class="space-y-1.5 mt-2 text-xs font-mono" id="multiai-leaderboard">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Consensus Facts Accordion -->
+        <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-4 shadow-sm">
+          <div class="flex items-center gap-2 border-b border-neutral-100 pb-3">
+            <span class="material-symbols-outlined text-base text-emerald-600">verified</span>
+            <h3 class="text-sm font-semibold text-neutral-900">Facts All 3 AIs Agreed On</h3>
+            <span class="text-xs text-neutral-400 ml-auto font-mono" id="multiai-consensus-facts-count">0 facts</span>
+          </div>
+          <div id="multiai-consensus-facts-list" class="space-y-2 text-xs font-mono text-neutral-700">
+            <!-- Facts list -->
+          </div>
+        </div>
+
+        <!-- Divergences & Discrepancies Alert -->
+        <div class="p-6 rounded-2xl border border-amber-200 bg-amber-50/40 space-y-3 shadow-sm" id="multiai-divergences-box">
+          <div class="flex items-center gap-2 text-amber-800">
+            <span class="material-symbols-outlined text-base">warning</span>
+            <h3 class="text-sm font-semibold">Disagreements &amp; AI Mistakes Found</h3>
+          </div>
+          <div id="multiai-divergences-list" class="space-y-2 text-xs text-amber-900 font-sans">
+            <!-- Injected discrepancies -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB: IN-AI PLUGINS & MODEL CONTEXT PROTOCOL (MCP)                         -->
+    <!-- ========================================================================= -->
+    <section class="tab-pane" id="plugins-view">
+      <!-- Header -->
+      <div class="mb-8 max-w-3xl">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-mono text-[11px] font-semibold text-brand bg-brand-subtle px-2.5 py-0.5 rounded-full">ADD-ONS &amp; APPS</span>
+          <span class="text-neutral-400 text-xs">•</span>
+          <span class="text-xs text-neutral-500 font-mono">Use Stalia Everywhere</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-900">Add-ons &amp; Integrations</h1>
+        <p class="mt-2 text-sm text-neutral-500 leading-relaxed font-normal">
+          Fact-check directly inside ChatGPT, Claude, Cursor, and Chrome using our 1-click bookmark button or MCP connection.
+        </p>
+      </div>
+
+      <!-- Segmented Sub-Tabs for Plugins -->
+      <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-xl bg-neutral-100 border border-neutral-200 mb-6 text-xs font-medium">
+        <button type="button" class="plugin-sub-tab active px-3.5 py-2 rounded-lg bg-white shadow-sm text-neutral-900" data-subtab="plugin-simulator" onclick="switchPluginSubTab('plugin-simulator')">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">play_circle</span>
+            <span>Live Chat Demo</span>
+          </span>
+        </button>
+        <button type="button" class="plugin-sub-tab px-3.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900" data-subtab="plugin-bookmarklet" onclick="switchPluginSubTab('plugin-bookmarklet')">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">bookmark</span>
+            <span>1-Click Bookmark Button</span>
+          </span>
+        </button>
+        <button type="button" class="plugin-sub-tab px-3.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900" data-subtab="plugin-mcp" onclick="switchPluginSubTab('plugin-mcp')">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">terminal</span>
+            <span>Cursor &amp; Claude MCP</span>
+          </span>
+        </button>
+        <button type="button" class="plugin-sub-tab px-3.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900" data-subtab="plugin-gpt-action" onclick="switchPluginSubTab('plugin-gpt-action')">
+          <span class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">smart_toy</span>
+            <span>Custom GPT Action</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Sub-Tab 1: Live In-AI Simulator -->
+      <div id="plugin-simulator-pane" class="plugin-pane space-y-6">
+        <!-- Simulator Platform Controls -->
+        <div class="p-4 rounded-xl border border-neutral-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-neutral-800">Simulate Stalia Plugin in:</span>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="setSimulatedPlatform('chatgpt')" id="sim-btn-chatgpt" class="sim-plat-btn active px-3 py-1.5 rounded-lg text-xs font-mono font-medium border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> ChatGPT
+              </button>
+              <button type="button" onclick="setSimulatedPlatform('claude')" id="sim-btn-claude" class="sim-plat-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Claude
+              </button>
+              <button type="button" onclick="setSimulatedPlatform('gemini')" id="sim-btn-gemini" class="sim-plat-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Gemini
+              </button>
+            </div>
+          </div>
+          <button type="button" onclick="simulatePluginCheck()" class="px-3.5 py-1.5 rounded-lg bg-brand hover:bg-brand-hover text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-sm">verified</span>
+            <span>Simulate Live Fact-Check</span>
+          </button>
+        </div>
+
+        <!-- Simulated Browser Shell -->
+        <div class="ai-mock-window">
+          <!-- Window Header Bar -->
+          <div class="ai-mock-header">
+            <div class="ai-mock-dots">
+              <div class="ai-mock-dot bg-red-400"></div>
+              <div class="ai-mock-dot bg-amber-400"></div>
+              <div class="ai-mock-dot bg-emerald-400"></div>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1 rounded-md bg-neutral-100 border border-neutral-200 text-[11px] font-mono text-neutral-600 max-w-md w-full justify-center">
+              <span class="material-symbols-outlined text-[13px] text-emerald-600">lock</span>
+              <span id="sim-browser-url">https://chatgpt.com/c/fact-verification-session</span>
+            </div>
+            <div class="text-[11px] font-mono text-brand font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
+              Stalia Active
+            </div>
+          </div>
+
+          <!-- Chat Conversation Mock -->
+          <div class="p-6 bg-neutral-900 text-neutral-100 space-y-6 min-h-[380px] font-sans">
+            <!-- User Message -->
+            <div class="flex justify-end">
+              <div class="max-w-xl p-3.5 rounded-2xl bg-neutral-800 border border-neutral-700 text-xs text-neutral-200 leading-relaxed" id="sim-user-prompt">
+                What are the latest facts regarding OpenAI models, Twitter's branding, and Microsoft's valuation?
+              </div>
+            </div>
+
+            <!-- Assistant Message with Floating Stalia Trust Pill -->
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center font-bold text-xs shrink-0" id="sim-bot-avatar">
+                AI
+              </div>
+              <div class="flex-1 space-y-3">
+                <div class="relative p-4 rounded-2xl bg-neutral-800/90 border border-neutral-700/80 text-xs text-neutral-200 leading-relaxed font-sans" id="sim-ai-response">
+                  1. OpenAI's flagship model is GPT-4, released in March 2023.<br>
+                  2. Twitter was acquired by Elon Musk for $44 billion and officially renamed to X in July 2023.<br>
+                  3. Microsoft's market capitalization surpassed $3 trillion in January 2024.<br>
+                  4. Google's Bard chatbot is the leading competitor to ChatGPT in multimodal generation.
+                  
+                  <!-- Floating Stalia Trust Pill -->
+                  <div class="stalia-floating-pill mt-4 pt-3 border-t border-neutral-700 flex items-center justify-between cursor-pointer" onclick="toggleSimPillDetails()" id="sim-trust-pill-box">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-brand text-white flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">verified</span>
+                        STALIA TRUST
+                      </span>
+                      <span class="text-xs font-mono font-semibold text-emerald-400" id="sim-pill-score">80/100 (Mostly Fresh)</span>
+                    </div>
+                    <span class="text-[11px] text-neutral-400 flex items-center gap-1">
+                      <span>3 Supported • 1 Stale</span>
+                      <span class="material-symbols-outlined text-xs">expand_more</span>
+                    </span>
+                  </div>
+
+                  <!-- Expanded Pill Breakdown -->
+                  <div id="sim-pill-expanded" class="hidden mt-3 p-3 rounded-lg bg-neutral-950 border border-neutral-700 text-[11px] font-mono text-neutral-300 space-y-2">
+                    <div class="text-emerald-400">✓ Microsoft $3T valuation verified (Jan 2024)</div>
+                    <div class="text-emerald-400">✓ Twitter rebrand to X verified (July 2023)</div>
+                    <div class="text-amber-400">⚠ Google Bard has been superseded by Google Gemini (Feb 2024)</div>
+                    <div class="pt-2 border-t border-neutral-800 text-[10px] text-neutral-500">
+                      Grounded by Stalia.AI via Bifrost LLM Gateway
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 2: Bookmarklet Pane -->
+      <div id="plugin-bookmarklet-pane" class="plugin-pane hidden space-y-6">
+        <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-4 shadow-sm">
+          <div class="border-b border-neutral-100 pb-3">
+            <h3 class="text-base font-semibold text-neutral-900">1-Click Browser Bookmarklet</h3>
+            <p class="text-xs text-neutral-500 mt-1">Fact-check any highlighted text across ChatGPT, Claude, Wikipedia, or news sites without installing an extension.</p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-3">
+            <div class="text-xs font-semibold text-neutral-800">Installation Method:</div>
+            <ol class="text-xs text-neutral-600 list-decimal list-inside space-y-1.5 font-normal">
+              <li>Drag the blue pill below directly into your browser's Bookmarks/Favorites bar.</li>
+              <li>Or click "Copy Bookmarklet Code", create a new bookmark, and paste it into the URL field.</li>
+              <li>Highlight any text on any webpage and click the bookmark to trigger live Stalia verification!</li>
+            </ol>
+
+            <div class="pt-2 flex items-center gap-3">
+              <a href="javascript:(function(){const endpoint='http://localhost:8082/api/plugin/verify';const sel=window.getSelection().toString().trim();const text=sel||document.body.innerText.slice(0,3000);if(!text||text.length<10){alert('Stalia.AI: Highlight text to verify or ensure page has content.');return;}const overlay=document.createElement('div');overlay.style='position:fixed;top:20px;right:20px;z-index:999999;width:340px;background:#18181b;color:#f4f4f5;border:1px solid #3E6AE1;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5);font-family:sans-serif;font-size:12px;';overlay.innerHTML='<div style=\"color:#3E6AE1;font-weight:bold;margin-bottom:8px;\">✨ Stalia.AI Verifying...</div><div>Corroborating factual claims with web grounding...</div>';document.body.appendChild(overlay);fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answer:text,format:'json'})}).then(r=>r.json()).then(d=>{overlay.innerHTML='<div style=\"display:flex;justify-content:space-between;border-bottom:1px solid #333;padding-bottom:6px;margin-bottom:8px;\"><strong style=\"color:#3E6AE1\">Stalia Score: '+(d.overallScore!==null?d.overallScore+'/100':'Unrated')+'</strong><button onclick=\"this.parentElement.parentElement.remove()\" style=\"background:none;border:none;color:#aaa;cursor:pointer;\">✕</button></div><div style=\"margin-bottom:6px;\">'+(d.scoreExplanation||'')+'</div><div style=\"font-size:11px;color:#aaa;\">✅ '+(d.summary?.supported||0)+' Supported | ⚠️ '+(d.summary?.potentiallyStale||0)+' Stale</div>';}).catch(e=>{overlay.innerHTML='<div style=\"color:#ef4444;margin-bottom:6px;\">Verification failed:</div><div style=\"font-size:11px;\">Ensure CodeLite AI server is running at localhost:8082</div><button onclick=\"this.parentElement.remove()\" style=\"margin-top:8px;padding:4px 8px;background:#333;color:white;border:none;border-radius:4px;\">Close</button>';});})();" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand text-white font-medium text-xs shadow hover:bg-brand-hover transition-colors cursor-grab" onclick="alert('Drag this button to your bookmarks bar!'); return false;" title="Drag me to your bookmarks bar!">
+                <span class="material-symbols-outlined text-sm">bookmark</span>
+                <span>✦ Drag to Bookmarks: Stalia Check</span>
+              </a>
+              <button type="button" onclick="copyStaliaBookmarklet()" class="px-3.5 py-2 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-medium transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">content_copy</span>
+                <span id="btn-copy-bm-text">Copy Bookmarklet Code</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 3: MCP Pane -->
+      <div id="plugin-mcp-pane" class="plugin-pane hidden space-y-6">
+        <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-4 shadow-sm">
+          <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div>
+              <h3 class="text-base font-semibold text-neutral-900">Model Context Protocol (MCP) Server</h3>
+              <p class="text-xs text-neutral-500 mt-1">Connect Claude Desktop, Cursor, and MCP clients directly to CodeLite's Stalia engine.</p>
+            </div>
+            <button type="button" onclick="testMcpEndpoint()" class="px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-xs font-mono text-neutral-700 flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">sync</span>
+              <span>Test GET /api/mcp</span>
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-neutral-800">Claude Desktop Configuration (claude_desktop_config.json)</span>
+              <button type="button" onclick="copyMcpJson()" class="text-xs text-brand hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">content_copy</span>
+                <span id="btn-copy-mcp-text">Copy JSON</span>
+              </button>
+            </div>
+            <pre class="p-4 rounded-xl bg-neutral-900 text-neutral-200 font-mono text-xs overflow-x-auto border border-neutral-800 leading-relaxed" id="mcp-config-snippet">{
+  "mcpServers": {
+    "stalia-freshness-checker": {
+      "url": "http://localhost:8082/api/mcp",
+      "transport": "http"
+    }
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 4: Custom GPT Action Pane -->
+      <div id="plugin-gpt-action-pane" class="plugin-pane hidden space-y-6">
+        <div class="p-6 rounded-2xl border border-neutral-200 bg-white space-y-4 shadow-sm">
+          <div class="border-b border-neutral-100 pb-3">
+            <h3 class="text-base font-semibold text-neutral-900">OpenAI Custom GPT Action Schema</h3>
+            <p class="text-xs text-neutral-500 mt-1">Add Stalia as an Action inside ChatGPT's GPT Builder to auto-verify assertions before responding.</p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-neutral-800">OpenAPI 3.0 Action Specification</span>
+              <button type="button" onclick="copyGptSchema()" class="text-xs text-brand hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">content_copy</span>
+                <span id="btn-copy-gpt-text">Copy OpenAPI Schema</span>
+              </button>
+            </div>
+            <pre class="p-4 rounded-xl bg-neutral-900 text-neutral-200 font-mono text-xs overflow-x-auto border border-neutral-800 leading-relaxed" id="gpt-action-schema-snippet">{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Stalia Factual Verification API",
+    "description": "Verifies factual claims in AI outputs against real-time grounded sources.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "http://localhost:8082" }
+  ],
+  "paths": {
+    "/api/plugin/verify": {
+      "post": {
+        "operationId": "verifyAIAnswer",
+        "summary": "Verify factual claims in text",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "answer": { "type": "string" },
+                  "provider": { "type": "string" }
+                },
+                "required": ["answer"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Verification result with claims and score" }
+        }
+      }
+    }
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
